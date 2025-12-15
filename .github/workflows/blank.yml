@@ -22,7 +22,7 @@ jobs:
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
       - name: Read docker images
-        run: echo registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.3 > images.txt
+        run: echo ghcr.io/google/mtail:3.0.8 > images.txt
 
       - name: Scan image with Trivy Action
         run: |
