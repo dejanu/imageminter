@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  scan:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -26,11 +26,21 @@ jobs:
       - uses: actions/checkout@v4
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Read docker images
+        run: echo registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.3 > images.txt
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Scan image with Trivy Action
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          while read image; do
+            echo "Scanning $image"
+            gh workflow run - <<EOF
+            - uses: aquasecurity/trivy-action@v0.33.1
+              with:
+                scan-type: "image"
+                image-ref: "$image"
+                severity: "CRITICAL,HIGH"
+                format: "table"
+                exit-code: 1
+            EOF
+          done < images.txt  
