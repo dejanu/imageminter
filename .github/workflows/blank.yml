@@ -26,11 +26,18 @@ jobs:
 
       - name: Scan image with Trivy Action
         run: |
-          while read image; do
-            echo "Scanning $image"
-            trivy image \
+          EXIT_CODE=0
+          
+          while IFS= read -r image; do
+            echo "Scanning $image..."
+            if trivy image \
               --severity CRITICAL,HIGH \
               --format table \
-              "$image"
+              "$image"; then
+              echo "✅ Scan completed for $image"
+            else
+              echo "⚠️  Vulnerabilities found in $image"
+              EXIT_CODE=1
+            fi
           done < images.txt
   
