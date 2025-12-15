@@ -43,12 +43,15 @@ jobs:
 
            while IFS= read -r image; do
              docker pull "$image"
-
+            
              IMAGE_NAME=$(basename "${image%%:*}")
              IMAGE_TAG="${image##*:}"
              TARGET_IMAGE="$ECR_REGISTRY/$ECR_REPO/$IMAGE_NAME:$IMAGE_TAG"
-
+             
              docker tag "$image" "$TARGET_IMAGE"
+
+             echo "Images status..."
+             docker images --format '{{.Repository}} and {{.Tag}}'
            done < images.txt          
 
   
