@@ -3,7 +3,12 @@ name: Scan Images
 
 on:
   workflow_dispatch:
-
+    inputs:
+      target_chart:
+        description: 'Helm chart directory to process (e.g., my-chart)'
+        required: true
+        type: string
+        default: 'my-chart'
 
 jobs:
   # This workflow contains a single job called "build"
