@@ -42,7 +42,7 @@ jobs:
           ECR_REPO=alchemy-docker
 
            while IFS= read -r image; do
-             docker pull "$image"
+             docker pull -q --platform linux/amd64 "$image"
             
              IMAGE_NAME=$(basename "${image%%:*}")
              IMAGE_TAG="${image##*:}"
