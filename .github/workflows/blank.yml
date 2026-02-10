@@ -65,5 +65,5 @@ jobs:
         run: |
           docker buildx imagetools create \
             --platform linux/amd64,linux/arm64 \
-            "${{ github.event.inputs.source_image }}" \
-            "docker.io/dejanualex/${{ github.event.inputs.target_tag }}"
+            --tag "docker.io/dejanualex/${{ github.event.inputs.target_tag }}" \
+            "${{ github.event.inputs.source_image }}"
