@@ -40,9 +40,9 @@ jobs:
       #     done < images.txt
       
       - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v3
-          with:
-            driver: docker-container
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -50,16 +50,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-        - name: Debug Docker Info
-          run: |
-            docker version
-            docker buildx version
-            docker buildx ls
-            docker info
+      - name: Debug Docker Info
+        run: |
+          docker version
+          docker buildx version
+          docker buildx ls
+          docker info
 
-        - name: Inspect Source Image
-          run: |
-            docker buildx imagetools inspect "${{ github.event.inputs.source_image }}"
+      - name: Inspect Source Image
+        run: |
+          docker buildx imagetools inspect "${{ github.event.inputs.source_image }}"
 
       - name: Mirror Multi-Platform Image
         run: |
