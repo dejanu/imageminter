@@ -4,11 +4,15 @@ name: Scan Images
 on:
   workflow_dispatch:
     inputs:
-      target_chart:
-        description: 'Helm chart directory to process (e.g., my-chart)'
+      source_image:
+        description: 'Source Docker image (e.g., nginx:latest)'
         required: true
         type: string
-        default: 'my-chart'
+        default: 'nginx:latest'
+      target_tag:
+        description: 'Tag for target image (e.g., mymirroredimage:latest)'
+        required: true
+        type: string
 
 jobs:
   # This workflow contains a single job called "build"
@@ -38,26 +42,19 @@ jobs:
               "$image"
               echo "✅ Scan completed for $image"
           done < images.txt
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Pull, retag and push images to ECR
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Mirror Multi-Platform Image
         run: |
-          set -euo pipefail
-
-          ECR_REGISTRY=209202477790.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPO=alchemy-docker
-
-           while IFS= read -r image; do
-             docker pull -q --platform linux/amd64 "$image"
-            
-             IMAGE_NAME=$(basename "${image%%:*}")
-             IMAGE_TAG="${image##*:}"
-             TARGET_IMAGE="$ECR_REGISTRY/$ECR_REPO/$IMAGE_NAME:$IMAGE_TAG"
-             
-             docker tag "$image" "$TARGET_IMAGE"
-
-           done < images.txt
-           
-           echo "Images status..."
-           docker images --format '{{.Repository}}:{{.Tag}}'
-
-  
+          docker buildx imagetools create \
+            --platform linux/amd64,linux/arm64 \
+            "${{ github.event.inputs.source_image }}" \
+            --name "docker.io/dejanualex/${{ github.event.inputs.target_tag }}"

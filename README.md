@@ -1,2 +1,2 @@
 # image_scanner
-workflow
+Trivy and scans images listed in `images.txt`
